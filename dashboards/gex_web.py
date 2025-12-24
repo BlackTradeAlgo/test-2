@@ -31,6 +31,17 @@ from config.settings import (
     TRADING_MINUTES_PER_DAY
 )
 
+# Import Greeks from core module (single source of truth)
+from core.greeks import (
+    norm_cdf,
+    norm_pdf,
+    calculate_implied_dividend_yield,
+    bs_d1_d2_with_dividend,
+    bs_price_with_dividend,
+    implied_volatility_with_dividend,
+    calculate_gamma_index
+)
+
 # Local override (this dashboard needs more strikes)
 NUM_STRIKES = 15  # +/- 15 strikes for GEX dashboard
 
@@ -47,15 +58,6 @@ atm_iv = 0.15  # Default ATM IV (will be calculated)
 
 
 # ============== WEBSITE-STYLE FUNCTIONS ==============
-
-def norm_cdf(x):
-    """Standard normal CDF"""
-    return (1.0 + math.erf(x / math.sqrt(2.0))) / 2.0
-
-
-def norm_pdf(x):
-    """Standard normal PDF"""
-    return math.exp(-0.5 * x * x) / math.sqrt(2 * math.pi)
 
 
 def calculate_time_to_expiry_minutes(expiry_str):
@@ -109,113 +111,9 @@ def calculate_time_to_expiry_minutes(expiry_str):
     return max(T, 0.00001)  # Minimum T to avoid division by zero
 
 
-def calculate_implied_dividend_yield(spot, futures, T, r):
-    """
-    Calculate implied dividend yield from futures price
-    q = r - (ln(F/S) / T)
-    """
-    if T <= 0 or spot <= 0 or futures <= 0:
-        return 0
-
-    try:
-        q = r - (math.log(futures / spot) / T)
-        # Clamp to reasonable range
-        return max(0, min(q, 0.05))  # 0% to 5%
-    except:
-        return 0.012  # Default 1.2%
-
-
-def bs_d1_d2_with_dividend(S, K, T, r, q, sigma):
-    """
-    Calculate d1 and d2 for dividend-adjusted Black-Scholes
-    d1 = (ln(S/K) + (r - q + 0.5*sigma^2)*T) / (sigma * sqrt(T))
-    d2 = d1 - sigma * sqrt(T)
-    """
-    if T <= 0 or sigma <= 0 or S <= 0 or K <= 0:
-        return 0, 0
-
-    sqrt_T = math.sqrt(T)
-    d1 = (math.log(S / K) + (r - q + 0.5 * sigma ** 2) * T) / (sigma * sqrt_T)
-    d2 = d1 - sigma * sqrt_T
-    return d1, d2
-
-
-def bs_price_with_dividend(S, K, T, r, q, sigma, option_type):
-    """
-    Black-Scholes price with continuous dividend yield
-    Call = S * e^(-qT) * N(d1) - K * e^(-rT) * N(d2)
-    Put  = K * e^(-rT) * N(-d2) - S * e^(-qT) * N(-d1)
-    """
-    if T <= 0:
-        if option_type == 'CE':
-            return max(0, S - K)
-        else:
-            return max(0, K - S)
-
-    d1, d2 = bs_d1_d2_with_dividend(S, K, T, r, q, sigma)
-
-    if option_type == 'CE':
-        price = S * math.exp(-q * T) * norm_cdf(d1) - K * math.exp(-r * T) * norm_cdf(d2)
-    else:
-        price = K * math.exp(-r * T) * norm_cdf(-d2) - S * math.exp(-q * T) * norm_cdf(-d1)
-
-    return max(0, price)
-
-
-def calculate_gamma_index(S, K, T, r, q, sigma):
-    """
-    Calculate Gamma using dividend-adjusted formula
-    Gamma = e^(-qT) * N'(d1) / (S * sigma * sqrt(T))
-
-    Note: Gamma is same for both Call and Put (same strike)
-    """
-    if T <= 0 or sigma <= 0 or S <= 0:
-        return 0
-
-    d1, _ = bs_d1_d2_with_dividend(S, K, T, r, q, sigma)
-    sqrt_T = math.sqrt(T)
-
-    gamma = math.exp(-q * T) * norm_pdf(d1) / (S * sigma * sqrt_T)
-    return gamma
-
-
-def implied_volatility_with_dividend(market_price, S, K, T, r, q, option_type, max_iter=100):
-    """
-    Calculate IV using Bisection method with dividend-adjusted BS
-    """
-    if T <= 0 or market_price <= 0:
-        return 0
-
-    # Calculate intrinsic value
-    intrinsic = max(0, S - K) if option_type == 'CE' else max(0, K - S)
-
-    # If market price is less than intrinsic (deep ITM)
-    if market_price < intrinsic:
-        return 0.01  # 1% IV
-
-    # Bisection method
-    low_vol = 0.001
-    high_vol = 5.0
-    tolerance = max(0.01, market_price * 0.001)
-
-    for _ in range(max_iter):
-        mid_vol = (low_vol + high_vol) / 2
-        mid_price = bs_price_with_dividend(S, K, T, r, q, mid_vol, option_type)
-
-        diff = mid_price - market_price
-
-        if abs(diff) < tolerance:
-            return mid_vol
-
-        if diff > 0:
-            high_vol = mid_vol
-        else:
-            low_vol = mid_vol
-
-        if (high_vol - low_vol) < 0.0001:
-            break
-
-    return mid_vol
+# NOTE: Greeks functions (norm_cdf, norm_pdf, calculate_implied_dividend_yield,
+# bs_d1_d2_with_dividend, bs_price_with_dividend, calculate_gamma_index,
+# implied_volatility_with_dividend) are now imported from core.greeks
 
 
 def get_atm_iv(spot, strikes_list, option_data_dict, option_tokens_dict, T, r, q):
