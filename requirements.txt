@@ -1,0 +1,23 @@
+# NIFTY Trading System - Dependencies
+# Install: pip3 install -r requirements.txt
+
+# Angel One API
+smartapi-python
+
+# Web Server
+flask
+flask-cors
+
+# Visualization
+matplotlib
+numpy
+plotly
+dash
+dash-bootstrap-components
+
+# Authentication
+pyotp
+
+# HTTP & WebSocket
+requests
+websocket-client
