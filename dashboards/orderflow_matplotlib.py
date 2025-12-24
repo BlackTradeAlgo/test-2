@@ -16,13 +16,10 @@ import matplotlib.patches as mpatches
 import numpy as np
 import requests
 
-# Data Server Configuration
-DATA_SERVER_URL = "http://127.0.0.1:8888"
+# Import configuration
+from config.settings import DATA_SERVER_URL, NIFTY_LOT_SIZE
 
-# Import from existing modules (only what's needed now)
-from nifty_option_chain import NIFTY_LOT_SIZE
-
-from volume_delta_engine import (
+from analysis.volume_delta import (
     process_tick,
     get_current_state,
     get_footprint_for_display,
@@ -32,7 +29,7 @@ from volume_delta_engine import (
     reset_engine
 )
 
-from order_flow_analyzer import (
+from analysis.analyzer import (
     analyze_tick,
     init_alerts_file,
     save_alert,
@@ -41,7 +38,7 @@ from order_flow_analyzer import (
     reset_analyzer
 )
 
-from order_flow_collector import (
+from analysis.collector import (
     classify_trade_direction,
     init_order_flow_file,
     save_order_flow_tick,

@@ -18,11 +18,17 @@ import websocket
 from flask import Flask, jsonify
 from flask_cors import CORS
 
-# Import from nifty_option_chain.py
-from nifty_option_chain import (
-    CREDENTIALS,
+# Import configuration
+from config.settings import (
     NIFTY_TOKEN,
     NIFTY_LOT_SIZE,
+    SERVER_PORT,
+    UPDATE_INTERVAL
+)
+
+# Import from nifty_option_chain.py (functions only, not constants)
+from nifty_option_chain import (
+    CREDENTIALS,
     login,
     load_all_tokens,
     get_nearest_futures_token,
@@ -31,10 +37,6 @@ from nifty_option_chain import (
     parse_snapquote_packet,
     parse_ltp_packet
 )
-
-# Server Configuration
-SERVER_PORT = 8888
-UPDATE_INTERVAL = 0.1  # 100ms minimum between broadcasts
 
 # Global data storage (shared with all dashboards)
 data_store = {

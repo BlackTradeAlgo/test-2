@@ -12,11 +12,8 @@ import csv
 from datetime import datetime
 from collections import defaultdict
 
-# Data Storage Configuration
-DATA_BASE_PATH = "/Users/harsh/Desktop/test 1/data"
-
-# NIFTY lot size
-NIFTY_LOT_SIZE = 75
+# Import configuration
+from config.settings import DATA_BASE_PATH, NIFTY_LOT_SIZE
 
 # Global state
 cvd = 0  # Cumulative Volume Delta

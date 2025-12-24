@@ -15,19 +15,18 @@ import csv
 from datetime import datetime
 import websocket
 
-# Import from existing nifty_option_chain.py
+# Import configuration
+from config.settings import DATA_BASE_PATH, NIFTY_LOT_SIZE
+
+# Import from existing nifty_option_chain.py (functions only)
 from nifty_option_chain import (
     CREDENTIALS,
-    NIFTY_LOT_SIZE,
     login,
     load_all_tokens,
     get_nearest_futures_token,
     parse_snapquote_packet,
     parse_ltp_packet
 )
-
-# Data Storage Configuration
-DATA_BASE_PATH = "/Users/harsh/Desktop/test 1/data"
 
 # Global state
 futures_token = None

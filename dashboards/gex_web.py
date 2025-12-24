@@ -20,17 +20,19 @@ import numpy as np
 import requests
 from datetime import datetime, timedelta
 
-# Data Server Configuration
-DATA_SERVER_URL = "http://127.0.0.1:8888"
+# Import configuration
+from config.settings import (
+    DATA_SERVER_URL,
+    NIFTY_TOKEN,
+    NIFTY_LOT_SIZE,
+    STRIKE_INTERVAL,
+    RISK_FREE_RATE,
+    TRADING_DAYS_PER_YEAR,
+    TRADING_MINUTES_PER_DAY
+)
 
-# NIFTY Configuration
-NIFTY_TOKEN = "99926000"
-STRIKE_INTERVAL = 50
-NUM_STRIKES = 15  # +/- 15 strikes
-RISK_FREE_RATE = 0.065  # 6.5% risk-free rate
-NIFTY_LOT_SIZE = 75
-TRADING_DAYS_PER_YEAR = 252
-TRADING_MINUTES_PER_DAY = 375  # 9:15 AM to 3:30 PM = 6.25 hours = 375 minutes
+# Local override (this dashboard needs more strikes)
+NUM_STRIKES = 15  # +/- 15 strikes for GEX dashboard
 
 # Global storage
 option_data = {}

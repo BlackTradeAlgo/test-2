@@ -13,11 +13,8 @@ import csv
 from datetime import datetime
 from collections import deque
 
-# Data Storage Configuration
-DATA_BASE_PATH = "/Users/harsh/Desktop/test 1/data"
-
-# NIFTY Configuration
-NIFTY_LOT_SIZE = 75
+# Import configuration
+from config.settings import DATA_BASE_PATH, NIFTY_LOT_SIZE
 
 # Detection Thresholds (can be adjusted)
 BIG_BLOCK_THRESHOLD = 50 * NIFTY_LOT_SIZE  # 50 lots = 3750 qty

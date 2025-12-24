@@ -15,15 +15,17 @@ import numpy as np
 import requests
 from datetime import datetime, timedelta
 
-# Data Server Configuration
-DATA_SERVER_URL = "http://127.0.0.1:8888"
+# Import configuration
+from config.settings import (
+    DATA_SERVER_URL,
+    NIFTY_TOKEN,
+    NIFTY_LOT_SIZE,
+    STRIKE_INTERVAL,
+    RISK_FREE_RATE
+)
 
-# NIFTY Configuration
-NIFTY_TOKEN = "99926000"
-STRIKE_INTERVAL = 50
+# Local override
 NUM_STRIKES = 15  # ±15 strikes for better GEX view
-RISK_FREE_RATE = 0.065  # 6.5% risk-free rate (RBI repo rate)
-NIFTY_LOT_SIZE = 75
 
 # Global storage
 option_data = {}
